@@ -1,0 +1,43 @@
+name: Auto Build and Deploy
+
+on:
+  push:
+    branches:
+      - main  # 替换为你的主分支
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
+
+      - name: Deploy to GitHub Pages
+        run: |
+          mkdir hanbbs
+          cp -R dist/* hanbbs/
+          echo "Build files copied to hanbbs folder"
+          
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Auto build and deploy to GitHub Pages
+          branch: main
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: $${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./hanbbs
